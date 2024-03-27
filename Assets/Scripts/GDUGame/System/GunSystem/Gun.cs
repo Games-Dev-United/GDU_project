@@ -23,6 +23,7 @@ namespace GDUGame {
       private GunData gunData;
 
       private int capacity;
+      private float coolDownTimer;
 
       public string Name;
 
@@ -31,6 +32,9 @@ namespace GDUGame {
       private void Awake() {
          bullet = transform.Find("Bullet").GetComponent<Bullet>();
          gunData = this.GetSystem<IGunSystem>().CurrentGunData;
+
+         // Set the gun to be able to fire immediately
+         coolDownTimer = 0.0f;
 
          State = new BindableProperty<GunState>() {
             Value = GunState.Idle,
@@ -41,7 +45,7 @@ namespace GDUGame {
       /// Gun Shoot, implement by Inst Bullet Instance GameObject
       /// </summary>
       public void Shoot() {
-         if(gunData.BulletCount.Value > 0 && State.Value == GunState.Idle) {
+         if(gunData.BulletCount.Value > 0 && State.Value == GunState.Idle && coolDownTimer <= 0) {
             //State Changing should be instead of using TimeSystem with Fire Frequency
             State.Value = GunState.Shooting;
             var b = Instantiate(bullet, bullet.transform.position, bullet.transform.rotation);
@@ -51,7 +55,16 @@ namespace GDUGame {
             b.Trigger(b.transform);
 
             State.Value = GunState.Idle;
+
+            coolDownTimer = 0.5f; // Cool Down time in seconds
          }
+      }
+
+      /// <summary>
+      /// Gun Cooldown, cooling down the gun between shots
+      /// </summary>
+      public void coolDown(float deltaTime){
+         coolDownTimer -= deltaTime;
       }
 
       /// <summary>

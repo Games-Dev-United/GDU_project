@@ -152,6 +152,8 @@ namespace GDUGame {
          underGravity();
 
          lookAt(pv.get());
+
+         coolDown();
       }
 
       private void FixedUpdate() {
@@ -349,6 +351,13 @@ namespace GDUGame {
       private void fire() {
          gun.Shoot();
          this.SendCommand(FireCommand.Singleton);
+      }
+
+      /// <summary>
+      /// Cool down the gun between shots (implements firerate)
+      /// </summary>
+      private void coolDown(){
+         gun.coolDown(Time.deltaTime);
       }
    }
 }
